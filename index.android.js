@@ -19,15 +19,22 @@ import Beacons from 'react-native-beacons-android'
 
 
 
-var ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 != r2});
+
 
 class tarShareBeacon extends React.Component {
   constructor(props){
     super(props)
     this.state = {
-       dataSource: ds.cloneWithRows([]),
+       dataSource: new ListView.DataSource({
+        rowHasChanged: (row1, row2) => row1 !== row2,
+      }),
+      loaded: false,
+      beacons:"",
+
     }
   }
+
+
   
   componentWillMount(){
   Beacons.detectIBeacons();
@@ -35,12 +42,17 @@ class tarShareBeacon extends React.Component {
     Beacons.startRangingBeaconsInRegion('REGION1').then(() => console.log(`Beacons monitoring started succesfully!`)).catch(
       error => console.log(`Beacons monitoring not started, error: ${error}`))
 
-    DeviceEventEmitter.addListener('beaconsDidRange', (beacons) => {
+     var didFindbeacon = DeviceEventEmitter.addListener('beaconsDidRange', (beacons) => {
       console.log('Found beacons!', beacons);
       this.setState({
-        dataSource: ds.cloneWithRows(beacons)
+        dataSource: this.state.dataSource.cloneWithRows(beacons)
       });
     });
+  }
+
+   componentWillUnmount() {
+    Beacons.stopScanning();
+     didFindbeacon.remove();
   }
 
   render() {
@@ -48,14 +60,18 @@ class tarShareBeacon extends React.Component {
       <ListView
         style={{marginTop:100}}
         dataSource={this.state.dataSource}
-        renderRow={(person) => {return this._renderPersonRow(person) }} />
+        renderRow={this.renderBeacons}
+
+        />
     );
   }
 
-  _renderPersonRow(person){
+  renderBeacons(beacons){
     return(
       <View>
-        <Text>txPower: {person.major}</Text>
+        <Text>txPower: {beacons}</Text>
+
+
       </View>
       )
   }
