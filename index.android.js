@@ -28,8 +28,7 @@ class tarShareBeacon extends React.Component {
        dataSource: new ListView.DataSource({
         rowHasChanged: (row1, row2) => row1 !== row2,
       }),
-      loaded: false,
-      beacons:"",
+      loaded: false
 
     }
   }
@@ -42,10 +41,10 @@ class tarShareBeacon extends React.Component {
     Beacons.startRangingBeaconsInRegion('REGION1').then(() => console.log(`Beacons monitoring started succesfully!`)).catch(
       error => console.log(`Beacons monitoring not started, error: ${error}`))
 
-     var didFindbeacon = DeviceEventEmitter.addListener('beaconsDidRange', (beacons) => {
-      console.log('Found beacons!', beacons);
+     var didFindbeacon = DeviceEventEmitter.addListener('beaconsDidRange', (data) => {
+      console.log('Found beacons!', data.beacons);
       this.setState({
-        dataSource: this.state.dataSource.cloneWithRows(beacons)
+        dataSource: this.state.dataSource.cloneWithRows(data.beacons)
       });
     });
   }
@@ -69,11 +68,16 @@ class tarShareBeacon extends React.Component {
   renderBeacons(beacons){
     return(
       <View>
-        <Text>txPower: {beacons}</Text>
+        <Text>distance:{beacons.distance}</Text>
+        <Text>major:{beacons.major}</Text>
+        <Text>minor:{beacons.c}</Text>
+        <Text>proximity:{beacons.proximity}</Text>
+        <Text>rssi:{beacons.rssi}</Text>
+        <Text>uuid:{beacons.uuid}</Text>
 
 
       </View>
-      )
+      );
   }
 }
 
